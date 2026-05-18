@@ -79,6 +79,10 @@ public class RespawnPoint {
 
     public void updateFrom(RespawnPoint other) {
         this.name = other.name;
+        updateFromKeepingName(other);
+    }
+
+    public void updateFromKeepingName(RespawnPoint other) {
         this.dimensionId = other.dimensionId;
         this.pos = other.pos;
         this.yaw = other.yaw;

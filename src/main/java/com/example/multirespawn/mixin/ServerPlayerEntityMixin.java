@@ -54,7 +54,7 @@ public abstract class ServerPlayerEntityMixin {
 
         RespawnDataStorage storage = RespawnDataStorage.get(player.getServer());
         PlayerRespawnData data = storage.getPlayerData(player.getUuid());
-        data.addOrUpdate(RespawnPoint.create(name, dimension.getValue(), pos, angle, player.getPitch(), type));
+        data.addOrUpdateKeepingExistingName(RespawnPoint.create(name, dimension.getValue(), pos, angle, player.getPitch(), type));
         storage.markDirty();
     }
 }

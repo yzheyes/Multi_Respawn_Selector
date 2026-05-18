@@ -40,6 +40,17 @@ public class PlayerRespawnData {
         return point;
     }
 
+    public RespawnPoint addOrUpdateKeepingExistingName(RespawnPoint point) {
+        Optional<RespawnPoint> sameLocation = findByLocation(point.getDimensionId(), point.getPos());
+        if (sameLocation.isPresent()) {
+            sameLocation.get().updateFromKeepingName(point);
+            return sameLocation.get();
+        }
+
+        points.add(point);
+        return point;
+    }
+
     public Optional<RespawnPoint> findById(UUID id) {
         return points.stream().filter(point -> point.getId().equals(id)).findFirst();
     }
