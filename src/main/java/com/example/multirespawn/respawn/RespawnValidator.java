@@ -11,6 +11,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -27,26 +28,26 @@ public final class RespawnValidator {
         RegistryKey<World> worldKey = RegistryKey.of(RegistryKeys.WORLD, point.getDimensionId());
         ServerWorld world = player.getServer().getWorld(worldKey);
         if (world == null) {
-            return ValidationResult.invalid("Dimension does not exist: " + point.getDimensionId());
+            return ValidationResult.invalid(Text.translatable("validation.multirespawn.dimension_missing", point.getDimensionId().toString()));
         }
 
         BlockState state = world.getBlockState(point.getPos());
         if (point.getType() == RespawnPointType.BED && !state.isIn(net.minecraft.registry.tag.BlockTags.BEDS)) {
-            return ValidationResult.invalid("The bed no longer exists.");
+            return ValidationResult.invalid(Text.translatable("validation.multirespawn.bed_missing"));
         }
 
         if (point.getType() == RespawnPointType.RESPAWN_ANCHOR) {
             if (!state.isOf(Blocks.RESPAWN_ANCHOR)) {
-                return ValidationResult.invalid("The respawn anchor no longer exists.");
+                return ValidationResult.invalid(Text.translatable("validation.multirespawn.anchor_missing"));
             }
             if (state.get(RespawnAnchorBlock.CHARGES) <= 0) {
-                return ValidationResult.invalid("The respawn anchor has no charge.");
+                return ValidationResult.invalid(Text.translatable("validation.multirespawn.anchor_no_charge"));
             }
         }
 
         Optional<Vec3d> safePos = findSafeRespawnPos(world, point.getPos());
         if (safePos.isEmpty()) {
-            return ValidationResult.invalid("No safe landing position was found.");
+            return ValidationResult.invalid(Text.translatable("validation.multirespawn.no_safe_pos"));
         }
 
         return ValidationResult.valid(world, safePos.get());

@@ -18,7 +18,7 @@ public class RenameRespawnPointScreen extends Screen {
     private TextFieldWidget nameField;
 
     public RenameRespawnPointScreen(UUID pointId, String currentName, String dimension, String pos) {
-        super(Text.literal("重命名重生点"));
+        super(Text.translatable("screen.multirespawn.rename.title"));
         this.pointId = pointId;
         this.currentName = currentName;
         this.dimension = dimension;
@@ -30,7 +30,8 @@ public class RenameRespawnPointScreen extends Screen {
         int fieldWidth = Math.min(300, width - 40);
         int left = (width - fieldWidth) / 2;
 
-        nameField = new TextFieldWidget(textRenderer, left, height / 2 - 18, fieldWidth, 20, Text.literal("Name"));
+        nameField = new TextFieldWidget(textRenderer, left, height / 2 - 18, fieldWidth, 20,
+                Text.translatable("field.multirespawn.name"));
         nameField.setMaxLength(64);
         nameField.setText(currentName);
         addDrawableChild(nameField);
@@ -40,10 +41,10 @@ public class RenameRespawnPointScreen extends Screen {
         nameField.setSelectionStart(0);
         nameField.setSelectionEnd(currentName.length());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("保存"), button -> save())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.save"), button -> save())
                 .dimensions(width / 2 - 102, height / 2 + 16, 98, 20)
                 .build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("取消"), button -> close())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.cancel"), button -> close())
                 .dimensions(width / 2 + 4, height / 2 + 16, 98, 20)
                 .build());
     }

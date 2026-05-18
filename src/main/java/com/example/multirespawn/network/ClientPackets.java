@@ -35,10 +35,10 @@ public final class ClientPackets {
         });
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.ERROR_MESSAGE, (client, handler, buf, responseSender) -> {
-            String message = buf.readString(32767);
+            Text message = buf.readText();
             client.execute(() -> {
                 if (client.player != null) {
-                    client.player.sendMessage(Text.literal(message), false);
+                    client.player.sendMessage(message, false);
                 }
             });
         });

@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -49,10 +50,10 @@ public final class ModPackets {
 
         ServerPlayNetworking.registerGlobalReceiver(RENAME_POINT, (server, player, handler, buf, responseSender) -> {
             UUID pointId = buf.readUuid();
-            String newName = buf.readString(64).trim();
+                String newName = buf.readString(64).trim();
             server.execute(() -> {
                 if (newName.isEmpty()) {
-                    sendError(player, "Respawn point name cannot be empty.");
+                    sendError(player, Text.translatable("commands.multirespawn.name_empty"));
                     return;
                 }
 
@@ -61,7 +62,7 @@ public final class ModPackets {
                     point.rename(newName);
                     storage.markDirty();
                     sendSyncPoints(player, RespawnSelectionService.refreshValidPoints(player));
-                }, () -> sendError(player, "That respawn point no longer exists."));
+                }, () -> sendError(player, Text.translatable("message.multirespawn.point_missing")));
             });
         });
     }
@@ -75,8 +76,12 @@ public final class ModPackets {
     }
 
     public static void sendError(ServerPlayerEntity player, String message) {
+        sendError(player, Text.literal(message));
+    }
+
+    public static void sendError(ServerPlayerEntity player, Text message) {
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeString(message);
+        buf.writeText(message);
         ServerPlayNetworking.send(player, ERROR_MESSAGE, buf);
     }
 

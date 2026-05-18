@@ -5,6 +5,7 @@ import com.example.multirespawn.data.RespawnDataStorage;
 import com.example.multirespawn.data.RespawnPoint;
 import com.example.multirespawn.network.ModPackets;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public final class RespawnSelectionService {
         PlayerRespawnData data = storage.getPlayerData(player.getUuid());
         RespawnPoint point = data.findById(pointId).orElse(null);
         if (point == null) {
-            ModPackets.sendError(player, "That respawn point no longer exists.");
+            ModPackets.sendError(player, Text.translatable("message.multirespawn.point_missing"));
             ModPackets.sendOpenChoiceScreen(player, refreshValidPoints(player));
             return;
         }

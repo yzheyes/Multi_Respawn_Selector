@@ -6,6 +6,7 @@ import com.example.multirespawn.data.RespawnPoint;
 import com.example.multirespawn.network.ModPackets;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Optional;
@@ -26,7 +27,7 @@ public final class RespawnTeleporter {
         PlayerRespawnData data = storage.getPlayerData(newPlayer.getUuid());
         RespawnPoint point = data.findById(pointId).orElse(null);
         if (point == null) {
-            ModPackets.sendError(newPlayer, "Selected respawn point no longer exists. Used vanilla respawn instead.");
+            ModPackets.sendError(newPlayer, Text.translatable("message.multirespawn.point_missing_vanilla"));
             return;
         }
 
@@ -34,7 +35,7 @@ public final class RespawnTeleporter {
         if (!result.isValid()) {
             data.remove(point.getId());
             storage.markDirty();
-            ModPackets.sendError(newPlayer, result.getReason() + " Used vanilla respawn instead.");
+            ModPackets.sendError(newPlayer, Text.translatable("message.multirespawn.validation_failed_vanilla", result.getReason()));
             return;
         }
 

@@ -53,7 +53,7 @@ public final class MultiRespawnCommand {
         data.addOrUpdate(point);
         storage.markDirty();
 
-        source.sendFeedback(() -> Text.literal("Added respawn point: " + name), false);
+        source.sendFeedback(() -> Text.translatable("commands.multirespawn.added", name), false);
         return 1;
     }
 
@@ -63,11 +63,11 @@ public final class MultiRespawnCommand {
         PlayerRespawnData data = RespawnDataStorage.get(player.getServer()).getPlayerData(player.getUuid());
 
         if (data.getPoints().isEmpty()) {
-            source.sendFeedback(() -> Text.literal("No multi respawn points saved."), false);
+            source.sendFeedback(() -> Text.translatable("commands.multirespawn.empty"), false);
             return 0;
         }
 
-        source.sendFeedback(() -> Text.literal("Saved multi respawn points:"), false);
+        source.sendFeedback(() -> Text.translatable("commands.multirespawn.list.header"), false);
         for (RespawnPoint point : data.getPoints()) {
             source.sendFeedback(() -> Text.literal("- " + point.getName()
                     + " [" + point.getId() + "] "
@@ -86,11 +86,11 @@ public final class MultiRespawnCommand {
         boolean removed = data.removeByIdOrName(idOrName);
         if (removed) {
             storage.markDirty();
-            source.sendFeedback(() -> Text.literal("Removed respawn point: " + idOrName), false);
+            source.sendFeedback(() -> Text.translatable("commands.multirespawn.removed", idOrName), false);
             return 1;
         }
 
-        source.sendError(Text.literal("No respawn point matched: " + idOrName));
+        source.sendError(Text.translatable("commands.multirespawn.no_match", idOrName));
         return 0;
     }
 
@@ -101,7 +101,7 @@ public final class MultiRespawnCommand {
         int count = data.getPoints().size();
         data.clear();
         storage.markDirty();
-        source.sendFeedback(() -> Text.literal("Cleared " + count + " respawn point(s)."), false);
+        source.sendFeedback(() -> Text.translatable("commands.multirespawn.cleared", count), false);
         return count;
     }
 
@@ -109,7 +109,7 @@ public final class MultiRespawnCommand {
         ServerPlayerEntity player = source.getPlayerOrThrow();
         String normalizedName = normalizeName(newName);
         if (normalizedName.isEmpty()) {
-            source.sendError(Text.literal("Respawn point name cannot be empty."));
+            source.sendError(Text.translatable("commands.multirespawn.name_empty"));
             return 0;
         }
 
@@ -117,14 +117,14 @@ public final class MultiRespawnCommand {
         PlayerRespawnData data = storage.getPlayerData(player.getUuid());
         RespawnPoint point = data.findByIdOrName(idOrName).orElse(null);
         if (point == null) {
-            source.sendError(Text.literal("No respawn point matched: " + idOrName));
+            source.sendError(Text.translatable("commands.multirespawn.no_match", idOrName));
             return 0;
         }
 
         String oldName = point.getName();
         point.rename(normalizedName);
         storage.markDirty();
-        source.sendFeedback(() -> Text.literal("Renamed respawn point '" + oldName + "' to '" + normalizedName + "'."), false);
+        source.sendFeedback(() -> Text.translatable("commands.multirespawn.renamed", oldName, normalizedName), false);
         return 1;
     }
 

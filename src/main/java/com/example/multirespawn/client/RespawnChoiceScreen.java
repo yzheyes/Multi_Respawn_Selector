@@ -27,7 +27,7 @@ public class RespawnChoiceScreen extends Screen {
     }
 
     public RespawnChoiceScreen(List<RespawnPointView> points, Screen previousScreen) {
-        super(Text.literal("Choose Respawn Point"));
+        super(Text.translatable("screen.multirespawn.respawn_choice.title"));
         this.points = new ArrayList<>(points);
         this.previousScreen = previousScreen;
     }
@@ -54,39 +54,39 @@ public class RespawnChoiceScreen extends Screen {
         for (int i = 0; i < visible; i++) {
             RespawnPointView point = points.get(offset + i);
             int y = listTop + i * ROW_HEIGHT;
-            addDrawableChild(ButtonWidget.builder(Text.literal("Respawn"), button -> {
+            addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.respawn"), button -> {
                 ClientPackets.chooseRespawnPoint(point.id());
                 close();
             }).dimensions(left + rowWidth - 56, y, 52, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Delete"), button ->
+            addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.delete"), button ->
                     ClientPackets.deleteRespawnPoint(point.id())
             ).dimensions(left + rowWidth - 112, y, 52, 20).build());
         }
 
         int controlsY = listTop + VISIBLE_ROWS * ROW_HEIGHT + 10;
-        addDrawableChild(ButtonWidget.builder(Text.literal("World Spawn"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.world_spawn"), button -> {
             ClientPackets.chooseRespawnPoint(RespawnSelectionService.WORLD_SPAWN_ID);
             close();
         }).dimensions(left, controlsY, 110, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Previous"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.previous"), button -> {
             offset = Math.max(0, offset - VISIBLE_ROWS);
             rebuildWidgets();
         }).dimensions(left + 122, controlsY, 70, 20).build()).active = offset > 0;
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Next"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.next"), button -> {
             offset = Math.min(Math.max(0, points.size() - VISIBLE_ROWS), offset + VISIBLE_ROWS);
             rebuildWidgets();
         }).dimensions(left + 198, controlsY, 70, 20).build()).active = offset + VISIBLE_ROWS < points.size();
 
         int lowerY = controlsY + 26;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), button -> {
-            Screen target = previousScreen != null ? previousScreen : new DeathScreen(Text.literal("You died!"), false);
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.back"), button -> {
+            Screen target = previousScreen != null ? previousScreen : new DeathScreen(Text.translatable("deathScreen.title"), false);
             client.setScreen(target);
         }).dimensions(left, lowerY, 80, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Title Screen"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.multirespawn.title_screen"), button -> {
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
             if (minecraftClient.world != null) {
                 minecraftClient.world.disconnect();
@@ -106,7 +106,7 @@ public class RespawnChoiceScreen extends Screen {
 
         if (points.isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer,
-                    Text.literal("No available respawn points. Use world spawn."),
+                    Text.translatable("message.multirespawn.no_available_points"),
                     width / 2, 80, 0xAAAAAA);
         } else {
             int visible = Math.min(VISIBLE_ROWS, Math.max(0, points.size() - offset));
