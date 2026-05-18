@@ -4,6 +4,7 @@ import com.example.multirespawn.data.PlayerRespawnData;
 import com.example.multirespawn.data.RespawnDataStorage;
 import com.example.multirespawn.data.RespawnPoint;
 import com.example.multirespawn.data.RespawnPointType;
+import com.example.multirespawn.respawn.RespawnSelectionService;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
@@ -58,6 +59,7 @@ public final class MultiRespawnCommand {
 
     private static int list(ServerCommandSource source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayerEntity player = source.getPlayerOrThrow();
+        RespawnSelectionService.refreshValidPoints(player);
         PlayerRespawnData data = RespawnDataStorage.get(player.getServer()).getPlayerData(player.getUuid());
 
         if (data.getPoints().isEmpty()) {

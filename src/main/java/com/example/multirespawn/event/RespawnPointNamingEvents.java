@@ -5,6 +5,7 @@ import com.example.multirespawn.data.RespawnDataStorage;
 import com.example.multirespawn.data.RespawnPoint;
 import com.example.multirespawn.data.RespawnPointType;
 import com.example.multirespawn.network.ModPackets;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -39,5 +40,28 @@ public final class RespawnPointNamingEvents {
             ModPackets.sendOpenRenameScreen(serverPlayer, point);
             return ActionResult.SUCCESS;
         });
+
+        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
+            if (world.isClient() || !isRespawnPointBlock(state)) {
+                return;
+            }
+
+            RespawnDataStorage storage = RespawnDataStorage.get(world.getServer());
+            boolean changed = false;
+            for (PlayerRespawnData data : storage.getAllPlayers()) {
+                RespawnPoint point = data.findByLocation(world.getRegistryKey().getValue(), pos).orElse(null);
+                if (point != null && (point.getType() == RespawnPointType.BED || point.getType() == RespawnPointType.RESPAWN_ANCHOR)) {
+                    changed |= data.remove(point.getId());
+                }
+            }
+
+            if (changed) {
+                storage.markDirty();
+            }
+        });
+    }
+
+    private static boolean isRespawnPointBlock(BlockState state) {
+        return state.isIn(BlockTags.BEDS) || state.isOf(Blocks.RESPAWN_ANCHOR);
     }
 }
