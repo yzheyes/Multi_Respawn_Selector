@@ -3,8 +3,11 @@ package com.example.multirespawn.client;
 import com.example.multirespawn.network.ClientPackets;
 import com.example.multirespawn.network.RespawnPointView;
 import com.example.multirespawn.respawn.RespawnSelectionService;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
@@ -16,11 +19,17 @@ public class RespawnChoiceScreen extends Screen {
     private static final int VISIBLE_ROWS = 7;
 
     private List<RespawnPointView> points;
+    private final Screen previousScreen;
     private int offset;
 
     public RespawnChoiceScreen(List<RespawnPointView> points) {
-        super(Text.literal("选择重生点"));
+        this(points, null);
+    }
+
+    public RespawnChoiceScreen(List<RespawnPointView> points, Screen previousScreen) {
+        super(Text.literal("Choose Respawn Point"));
         this.points = new ArrayList<>(points);
+        this.previousScreen = previousScreen;
     }
 
     public void setPoints(List<RespawnPointView> points) {
@@ -45,31 +54,45 @@ public class RespawnChoiceScreen extends Screen {
         for (int i = 0; i < visible; i++) {
             RespawnPointView point = points.get(offset + i);
             int y = listTop + i * ROW_HEIGHT;
-            addDrawableChild(ButtonWidget.builder(Text.literal("重生"), button -> {
+            addDrawableChild(ButtonWidget.builder(Text.literal("Respawn"), button -> {
                 ClientPackets.chooseRespawnPoint(point.id());
                 close();
             }).dimensions(left + rowWidth - 56, y, 52, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("删除"), button ->
+            addDrawableChild(ButtonWidget.builder(Text.literal("Delete"), button ->
                     ClientPackets.deleteRespawnPoint(point.id())
             ).dimensions(left + rowWidth - 112, y, 52, 20).build());
         }
 
         int controlsY = listTop + VISIBLE_ROWS * ROW_HEIGHT + 10;
-        addDrawableChild(ButtonWidget.builder(Text.literal("世界出生点"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("World Spawn"), button -> {
             ClientPackets.chooseRespawnPoint(RespawnSelectionService.WORLD_SPAWN_ID);
             close();
         }).dimensions(left, controlsY, 110, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("上一页"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("Previous"), button -> {
             offset = Math.max(0, offset - VISIBLE_ROWS);
             rebuildWidgets();
         }).dimensions(left + 122, controlsY, 70, 20).build()).active = offset > 0;
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("下一页"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("Next"), button -> {
             offset = Math.min(Math.max(0, points.size() - VISIBLE_ROWS), offset + VISIBLE_ROWS);
             rebuildWidgets();
         }).dimensions(left + 198, controlsY, 70, 20).build()).active = offset + VISIBLE_ROWS < points.size();
+
+        int lowerY = controlsY + 26;
+        addDrawableChild(ButtonWidget.builder(Text.literal("Back"), button -> {
+            Screen target = previousScreen != null ? previousScreen : new DeathScreen(Text.literal("You died!"), false);
+            client.setScreen(target);
+        }).dimensions(left, lowerY, 80, 20).build());
+
+        addDrawableChild(ButtonWidget.builder(Text.literal("Title Screen"), button -> {
+            MinecraftClient minecraftClient = MinecraftClient.getInstance();
+            if (minecraftClient.world != null) {
+                minecraftClient.world.disconnect();
+            }
+            minecraftClient.disconnect(new TitleScreen());
+        }).dimensions(left + 88, lowerY, 110, 20).build());
     }
 
     @Override
@@ -83,7 +106,7 @@ public class RespawnChoiceScreen extends Screen {
 
         if (points.isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer,
-                    Text.literal("没有可用重生点，使用世界出生点"),
+                    Text.literal("No available respawn points. Use world spawn."),
                     width / 2, 80, 0xAAAAAA);
         } else {
             int visible = Math.min(VISIBLE_ROWS, Math.max(0, points.size() - offset));

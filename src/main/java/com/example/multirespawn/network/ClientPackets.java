@@ -21,7 +21,7 @@ public final class ClientPackets {
     public static void registerClientReceivers() {
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.OPEN_CHOICE_SCREEN, (client, handler, buf, responseSender) -> {
             List<RespawnPointView> points = readPointViews(buf);
-            client.execute(() -> client.setScreen(new RespawnChoiceScreen(points)));
+            client.execute(() -> client.setScreen(new RespawnChoiceScreen(points, client.currentScreen)));
         });
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.SYNC_POINTS, (client, handler, buf, responseSender) -> {

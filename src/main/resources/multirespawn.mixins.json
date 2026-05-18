@@ -7,9 +7,7 @@
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
-  "client": [
-    "DeathScreenMixin"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
