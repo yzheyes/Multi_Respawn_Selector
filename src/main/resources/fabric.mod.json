@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "multirespawn",
+  "version": "${version}",
+  "name": "Multi Respawn Selector",
+  "description": "Keeps multiple player respawn points and lets players choose one before respawning.",
+  "authors": [
+    "Codex"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.example.multirespawn.MultiRespawnMod"
+    ],
+    "client": [
+      "com.example.multirespawn.MultiRespawnClient"
+    ]
+  },
+  "mixins": [
+    "multirespawn.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "1.20.1",
+    "java": ">=17"
+  }
+}
