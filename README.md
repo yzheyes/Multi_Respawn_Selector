@@ -4,6 +4,8 @@ Multi Respawn Selector is a Fabric mod for Minecraft Java Edition 1.20.1. It let
 
 When you die, the vanilla respawn button opens a respawn point selection screen. You can choose any currently valid saved bed, respawn anchor, command-added point, or the world spawn.
 
+![Respawn point selection screen](screenshot.png)
+
 ## Features
 
 - Saves multiple respawn points for each player.
