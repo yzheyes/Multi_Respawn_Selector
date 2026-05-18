@@ -1,51 +1,136 @@
 # Multi Respawn Selector
 
-Fabric 1.20.1 mod that stores multiple respawn points per player and lets the player choose one from the death screen before the vanilla respawn request is processed.
+Multi Respawn Selector is a Fabric mod for Minecraft Java Edition 1.20.1. It lets each player keep multiple respawn points instead of being limited to the last bed or respawn anchor they used.
 
-## Build
+When you die, the vanilla respawn button opens a respawn point selection screen. You can choose any currently valid saved bed, respawn anchor, command-added point, or the world spawn.
 
-Use Java 17 or Java 21 to run Gradle. The current project was verified with Microsoft JDK 21 and Gradle 8.8.
+## Features
 
-```powershell
-$env:JAVA_HOME = 'C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot'
-.\gradlew.bat build
+- Saves multiple respawn points for each player.
+- Supports beds, respawn anchors, and command-added custom points.
+- Shows a respawn point selection screen after death.
+- Validates respawn points on the server before use.
+- Removes invalid points when beds or respawn anchors are broken, missing, blocked, uncharged, or unsafe.
+- Supports cross-dimension respawning.
+- Consumes only one respawn anchor charge per successful anchor respawn.
+- Allows renaming saved bed and respawn anchor points.
+- Persists saved respawn data across server restarts.
+- Includes English and Simplified Chinese localization.
+
+## Requirements
+
+- Minecraft Java Edition 1.20.1
+- Fabric Loader
+- Fabric API
+- Java 17 or newer
+
+The mod must be installed on both client and server.
+
+## How To Use
+
+Set respawn points normally:
+
+- Sleep in a bed to save that bed.
+- Use a charged respawn anchor to save that anchor.
+- Use `/multirespawn add <name>` to save your current position as a command respawn point.
+
+After death:
+
+1. Click the vanilla respawn button.
+2. Choose a saved respawn point from the selection screen.
+3. The server validates the selected point.
+4. If the point is valid, you respawn there.
+5. If the point is invalid, it is removed or rejected and the list refreshes.
+
+If there are no valid saved respawn points, use the world spawn option.
+
+## Renaming Respawn Points
+
+Sneak + right-click one of your saved beds or respawn anchors to open the rename screen.
+
+You can also rename points with:
+
+```text
+/multirespawn rename <id_or_name> <new_name>
 ```
 
-The remapped mod jar is written to `build/libs/`.
+If the old name contains spaces, wrap it in quotes:
 
-## Gameplay Flow
-
-- Setting a vanilla spawn point captures a mod respawn point through `ServerPlayerEntity#setSpawnPoint`.
-- The death screen gets a `选择重生点` button.
-- The client requests available points; the server validates and filters them.
-- Choosing a point records a server-side pending choice, then the client sends the vanilla respawn packet.
-- `PlayerManager#respawnPlayer` applies the pending choice to the new player instance and teleports across dimensions if needed.
+```text
+/multirespawn rename "Main Base Bed" "Village Backup Bed"
+```
 
 ## Commands
 
-- `/multirespawn add <name>`: add the player's current position as a command respawn point.
-- `/multirespawn list`: list saved points for the player.
-- `/multirespawn remove <id_or_name>`: remove a saved point.
-- `/multirespawn rename <id_or_name> <new_name>`: rename a saved point. Use quotes around the old name if it contains spaces.
-- `/multirespawn clear`: clear all saved points for the player.
+```text
+/multirespawn add <name>
+```
 
-Sneak + right-click one of your saved bed or respawn anchor points to open a rename box.
+Adds your current position as a command respawn point.
 
-## Manual Test Cases
+```text
+/multirespawn list
+```
 
-- Save multiple overworld beds, die, and choose each one.
-- Save multiple charged nether anchors, die, and confirm one charge is consumed after use.
-- Die in the overworld and choose a nether anchor.
-- Die in the nether and choose an overworld bed.
-- Break a bed and confirm it disappears from the choice list.
-- Drain an anchor and confirm it is rejected.
-- Restart the server and confirm data persists.
-- Test two players and confirm each list is isolated.
-- Click vanilla respawn with multiple valid points and confirm the chooser opens instead.
-- Confirm vanilla world spawn is still available from the chooser.
-- Sneak + right-click a saved bed or respawn anchor and confirm the rename screen updates the saved display name.
-- Run `/multirespawn rename <id_or_name> <new_name>` and confirm `/multirespawn list` shows the new name.
+Lists your saved respawn points. The list is refreshed before display, so invalid beds and anchors are cleaned up.
 
-## Notes
+```text
+/multirespawn remove <id_or_name>
+```
 
-The code targets Yarn `1.20.1+build.10`. If updating mappings or Minecraft versions, re-check the three Mixin targets in `multirespawn.mixins.json`, especially `ServerPlayerEntity#setSpawnPoint`, `ServerPlayNetworkHandler#onClientStatus`, and `PlayerManager#respawnPlayer`.
+Removes one saved respawn point.
+
+```text
+/multirespawn rename <id_or_name> <new_name>
+```
+
+Renames one saved respawn point.
+
+```text
+/multirespawn clear
+```
+
+Clears all of your saved respawn points.
+
+## Valid Respawn Points
+
+A saved point must still be safe and usable.
+
+Beds are invalid if:
+
+- The bed block was broken.
+- The saved position is no longer a bed.
+- No safe landing spot can be found nearby.
+
+Respawn anchors are invalid if:
+
+- The anchor was broken.
+- The saved position is no longer a respawn anchor.
+- The anchor has no charge.
+- No safe landing spot can be found nearby.
+
+Command and custom points are invalid if:
+
+- The dimension no longer exists.
+- No safe landing spot can be found nearby.
+
+## Localization
+
+The mod includes:
+
+- English: `en_us`
+- Simplified Chinese: `zh_cn`
+
+The displayed language follows the player's Minecraft language setting.
+
+## Build From Source
+
+```powershell
+.\gradlew.bat build
+```
+
+The built mod jar is generated in:
+
+```text
+build/libs/
+```
