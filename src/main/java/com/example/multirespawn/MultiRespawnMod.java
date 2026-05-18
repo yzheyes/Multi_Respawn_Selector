@@ -1,6 +1,7 @@
 package com.example.multirespawn;
 
 import com.example.multirespawn.command.MultiRespawnCommand;
+import com.example.multirespawn.event.RespawnPointNamingEvents;
 import com.example.multirespawn.network.ModPackets;
 import com.example.multirespawn.respawn.PendingRespawnChoiceManager;
 import net.fabricmc.api.ModInitializer;
@@ -19,6 +20,7 @@ public class MultiRespawnMod implements ModInitializer {
     public void onInitialize() {
         ModPackets.registerServerReceivers();
         MultiRespawnCommand.register();
+        RespawnPointNamingEvents.register();
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
                 PendingRespawnChoiceManager.clear(handler.player.getUuid()));

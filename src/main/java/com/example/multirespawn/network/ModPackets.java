@@ -21,6 +21,8 @@ public final class ModPackets {
     public static final Identifier SYNC_POINTS = MultiRespawnMod.id("sync_points");
     public static final Identifier ERROR_MESSAGE = MultiRespawnMod.id("error_message");
     public static final Identifier TRIGGER_RESPAWN = MultiRespawnMod.id("trigger_respawn");
+    public static final Identifier OPEN_RENAME_SCREEN = MultiRespawnMod.id("open_rename_screen");
+    public static final Identifier RENAME_POINT = MultiRespawnMod.id("rename_point");
 
     private ModPackets() {
     }
@@ -44,6 +46,24 @@ public final class ModPackets {
                 }
             });
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(RENAME_POINT, (server, player, handler, buf, responseSender) -> {
+            UUID pointId = buf.readUuid();
+            String newName = buf.readString(64).trim();
+            server.execute(() -> {
+                if (newName.isEmpty()) {
+                    sendError(player, "Respawn point name cannot be empty.");
+                    return;
+                }
+
+                RespawnDataStorage storage = RespawnDataStorage.get(server);
+                storage.getPlayerData(player.getUuid()).findById(pointId).ifPresentOrElse(point -> {
+                    point.rename(newName);
+                    storage.markDirty();
+                    sendSyncPoints(player, RespawnSelectionService.refreshValidPoints(player));
+                }, () -> sendError(player, "That respawn point no longer exists."));
+            });
+        });
     }
 
     public static void sendOpenChoiceScreen(ServerPlayerEntity player, List<RespawnPoint> points) {
@@ -62,6 +82,15 @@ public final class ModPackets {
 
     public static void sendTriggerRespawn(ServerPlayerEntity player) {
         ServerPlayNetworking.send(player, TRIGGER_RESPAWN, PacketByteBufs.empty());
+    }
+
+    public static void sendOpenRenameScreen(ServerPlayerEntity player, RespawnPoint point) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeUuid(point.getId());
+        buf.writeString(point.getName());
+        buf.writeIdentifier(point.getDimensionId());
+        buf.writeBlockPos(point.getPos());
+        ServerPlayNetworking.send(player, OPEN_RENAME_SCREEN, buf);
     }
 
     private static PacketByteBuf writePointViews(List<RespawnPoint> points) {

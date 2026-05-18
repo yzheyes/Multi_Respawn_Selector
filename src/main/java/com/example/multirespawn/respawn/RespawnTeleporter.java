@@ -3,11 +3,7 @@ package com.example.multirespawn.respawn;
 import com.example.multirespawn.data.PlayerRespawnData;
 import com.example.multirespawn.data.RespawnDataStorage;
 import com.example.multirespawn.data.RespawnPoint;
-import com.example.multirespawn.data.RespawnPointType;
 import com.example.multirespawn.network.ModPackets;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
@@ -46,24 +42,6 @@ public final class RespawnTeleporter {
         Vec3d safePos = result.getSafePos().orElseThrow();
         newPlayer.teleport(world, safePos.x, safePos.y, safePos.z, point.getYaw(), point.getPitch());
 
-        if (point.getType() == RespawnPointType.RESPAWN_ANCHOR) {
-            consumeAnchorCharge(world, point);
-        }
-
         ModPackets.sendSyncPoints(newPlayer, RespawnSelectionService.refreshValidPoints(newPlayer));
-    }
-
-    private static void consumeAnchorCharge(ServerWorld world, RespawnPoint point) {
-        BlockState state = world.getBlockState(point.getPos());
-        if (!state.contains(RespawnAnchorBlock.CHARGES)) {
-            return;
-        }
-
-        int charges = state.get(RespawnAnchorBlock.CHARGES);
-        if (charges <= 0) {
-            return;
-        }
-
-        world.setBlockState(point.getPos(), state.with(RespawnAnchorBlock.CHARGES, charges - 1), Block.NOTIFY_ALL);
     }
 }

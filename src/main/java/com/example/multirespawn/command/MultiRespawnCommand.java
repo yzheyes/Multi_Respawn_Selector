@@ -31,6 +31,12 @@ public final class MultiRespawnCommand {
                                 .then(argument("id_or_name", StringArgumentType.greedyString())
                                         .executes(context -> remove(context.getSource(),
                                                 StringArgumentType.getString(context, "id_or_name")))))
+                        .then(literal("rename")
+                                .then(argument("id_or_name", StringArgumentType.string())
+                                        .then(argument("new_name", StringArgumentType.greedyString())
+                                                .executes(context -> rename(context.getSource(),
+                                                        StringArgumentType.getString(context, "id_or_name"),
+                                                        StringArgumentType.getString(context, "new_name"))))))
                         .then(literal("clear")
                                 .executes(context -> clear(context.getSource())))));
     }
@@ -95,5 +101,36 @@ public final class MultiRespawnCommand {
         storage.markDirty();
         source.sendFeedback(() -> Text.literal("Cleared " + count + " respawn point(s)."), false);
         return count;
+    }
+
+    private static int rename(ServerCommandSource source, String idOrName, String newName) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayerEntity player = source.getPlayerOrThrow();
+        String normalizedName = normalizeName(newName);
+        if (normalizedName.isEmpty()) {
+            source.sendError(Text.literal("Respawn point name cannot be empty."));
+            return 0;
+        }
+
+        RespawnDataStorage storage = RespawnDataStorage.get(player.getServer());
+        PlayerRespawnData data = storage.getPlayerData(player.getUuid());
+        RespawnPoint point = data.findByIdOrName(idOrName).orElse(null);
+        if (point == null) {
+            source.sendError(Text.literal("No respawn point matched: " + idOrName));
+            return 0;
+        }
+
+        String oldName = point.getName();
+        point.rename(normalizedName);
+        storage.markDirty();
+        source.sendFeedback(() -> Text.literal("Renamed respawn point '" + oldName + "' to '" + normalizedName + "'."), false);
+        return 1;
+    }
+
+    private static String normalizeName(String name) {
+        String trimmed = name.trim();
+        if (trimmed.length() > 64) {
+            return trimmed.substring(0, 64);
+        }
+        return trimmed;
     }
 }

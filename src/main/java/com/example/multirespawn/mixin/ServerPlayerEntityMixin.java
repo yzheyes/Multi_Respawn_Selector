@@ -4,6 +4,7 @@ import com.example.multirespawn.data.PlayerRespawnData;
 import com.example.multirespawn.data.RespawnDataStorage;
 import com.example.multirespawn.data.RespawnPoint;
 import com.example.multirespawn.data.RespawnPointType;
+import com.example.multirespawn.respawn.SpawnPointCaptureGuard;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
@@ -23,6 +24,10 @@ public abstract class ServerPlayerEntityMixin {
     @Inject(method = "setSpawnPoint", at = @At("TAIL"))
     private void multirespawn$captureSpawnPoint(RegistryKey<World> dimension, @Nullable BlockPos pos, float angle,
                                                 boolean forced, boolean sendMessage, CallbackInfo ci) {
+        if (SpawnPointCaptureGuard.isSuppressed()) {
+            return;
+        }
+
         if (pos == null) {
             return;
         }

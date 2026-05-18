@@ -19,7 +19,9 @@ public final class RespawnSelectionService {
     public static void handleRequest(ServerPlayerEntity player) {
         List<RespawnPoint> validPoints = refreshValidPoints(player);
         if (validPoints.size() == 1) {
-            PendingRespawnChoiceManager.setPoint(player.getUuid(), validPoints.get(0).getId());
+            RespawnPoint point = validPoints.get(0);
+            VanillaRespawnBridge.alignVanillaSpawnPoint(player, point);
+            PendingRespawnChoiceManager.setPoint(player.getUuid(), point.getId());
             ModPackets.sendTriggerRespawn(player);
             return;
         }
@@ -52,6 +54,7 @@ public final class RespawnSelectionService {
             return;
         }
 
+        VanillaRespawnBridge.alignVanillaSpawnPoint(player, point);
         PendingRespawnChoiceManager.setPoint(player.getUuid(), point.getId());
         ModPackets.sendTriggerRespawn(player);
     }
@@ -68,7 +71,9 @@ public final class RespawnSelectionService {
         }
 
         if (validPoints.size() == 1) {
-            PendingRespawnChoiceManager.setPoint(player.getUuid(), validPoints.get(0).getId());
+            RespawnPoint point = validPoints.get(0);
+            VanillaRespawnBridge.alignVanillaSpawnPoint(player, point);
+            PendingRespawnChoiceManager.setPoint(player.getUuid(), point.getId());
         }
 
         return false;

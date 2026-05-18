@@ -26,7 +26,10 @@ The remapped mod jar is written to `build/libs/`.
 - `/multirespawn add <name>`: add the player's current position as a command respawn point.
 - `/multirespawn list`: list saved points for the player.
 - `/multirespawn remove <id_or_name>`: remove a saved point.
+- `/multirespawn rename <id_or_name> <new_name>`: rename a saved point. Use quotes around the old name if it contains spaces.
 - `/multirespawn clear`: clear all saved points for the player.
+
+Sneak + right-click one of your saved bed or respawn anchor points to open a rename box.
 
 ## Manual Test Cases
 
@@ -40,6 +43,8 @@ The remapped mod jar is written to `build/libs/`.
 - Test two players and confirm each list is isolated.
 - Click vanilla respawn with multiple valid points and confirm the chooser opens instead.
 - Confirm vanilla world spawn is still available from the chooser.
+- Sneak + right-click a saved bed or respawn anchor and confirm the rename screen updates the saved display name.
+- Run `/multirespawn rename <id_or_name> <new_name>` and confirm `/multirespawn list` shows the new name.
 
 ## Notes
 

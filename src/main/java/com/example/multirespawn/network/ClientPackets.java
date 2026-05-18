@@ -1,6 +1,7 @@
 package com.example.multirespawn.network;
 
 import com.example.multirespawn.client.RespawnChoiceScreen;
+import com.example.multirespawn.client.RenameRespawnPointScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
@@ -44,6 +45,14 @@ public final class ClientPackets {
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.TRIGGER_RESPAWN, (client, handler, buf, responseSender) ->
                 client.execute(ClientPackets::sendVanillaRespawnRequest));
+
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.OPEN_RENAME_SCREEN, (client, handler, buf, responseSender) -> {
+            UUID pointId = buf.readUuid();
+            String currentName = buf.readString(32767);
+            String dimension = buf.readIdentifier().toString();
+            String pos = buf.readBlockPos().toShortString();
+            client.execute(() -> client.setScreen(new RenameRespawnPointScreen(pointId, currentName, dimension, pos)));
+        });
     }
 
     public static void requestRespawnPoints() {
@@ -60,6 +69,13 @@ public final class ClientPackets {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeUuid(pointId);
         ClientPlayNetworking.send(ModPackets.DELETE_POINT, buf);
+    }
+
+    public static void renameRespawnPoint(UUID pointId, String newName) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeUuid(pointId);
+        buf.writeString(newName.trim(), 64);
+        ClientPlayNetworking.send(ModPackets.RENAME_POINT, buf);
     }
 
     private static void sendVanillaRespawnRequest() {

@@ -44,6 +44,14 @@ public class PlayerRespawnData {
         return points.stream().filter(point -> point.getId().equals(id)).findFirst();
     }
 
+    public Optional<RespawnPoint> findByIdOrName(String idOrName) {
+        try {
+            return findById(UUID.fromString(idOrName));
+        } catch (IllegalArgumentException ignored) {
+            return points.stream().filter(point -> point.getName().equalsIgnoreCase(idOrName)).findFirst();
+        }
+    }
+
     public Optional<RespawnPoint> findByLocation(Identifier dimensionId, BlockPos pos) {
         return points.stream()
                 .filter(point -> point.getDimensionId().equals(dimensionId) && point.getPos().equals(pos))

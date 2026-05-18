@@ -72,6 +72,11 @@ public class RespawnPoint {
         return valid;
     }
 
+    public void rename(String name) {
+        this.name = name;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
     public void updateFrom(RespawnPoint other) {
         this.name = other.name;
         this.dimensionId = other.dimensionId;
