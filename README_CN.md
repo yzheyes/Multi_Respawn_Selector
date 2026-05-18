@@ -6,7 +6,7 @@ Multi Respawn Selector 是一个适用于 Minecraft Java 版 1.20.1 的 Fabric �
 
 玩家死亡后，点击原版“重生”按钮会打开重生点选择界面。你可以从仍然有效的床、重生锚、命令添加的重生点，或世界出生点中选择一个位置复活。
 
-![重生点选择界面](screenshot_CN.png)
+![重生点选择界面](Screenshot/screenshot_CN.png)
 
 ## 功能
 
@@ -51,6 +51,8 @@ Multi Respawn Selector 是一个适用于 Minecraft Java 版 1.20.1 的 Fabric �
 ## 重命名重生点
 
 对自己已经保存过的床或重生锚潜行 + 右键，可以打开重命名界面。
+
+![重命名重生点界面](Screenshot/rename_CN.png)
 
 也可以使用指令重命名：
 
