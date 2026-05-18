@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 
 import java.util.UUID;
@@ -32,9 +33,12 @@ public class RenameRespawnPointScreen extends Screen {
         nameField = new TextFieldWidget(textRenderer, left, height / 2 - 18, fieldWidth, 20, Text.literal("Name"));
         nameField.setMaxLength(64);
         nameField.setText(currentName);
-        nameField.setFocused(true);
         addDrawableChild(nameField);
         setInitialFocus(nameField);
+        setFocused(nameField);
+        nameField.setFocused(true);
+        nameField.setSelectionStart(0);
+        nameField.setSelectionEnd(currentName.length());
 
         addDrawableChild(ButtonWidget.builder(Text.literal("保存"), button -> save())
                 .dimensions(width / 2 - 102, height / 2 + 16, 98, 20)
@@ -50,6 +54,16 @@ public class RenameRespawnPointScreen extends Screen {
             ClientPackets.renameRespawnPoint(pointId, newName);
         }
         close();
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputUtil.GLFW_KEY_ENTER || keyCode == InputUtil.GLFW_KEY_KP_ENTER) {
+            save();
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
